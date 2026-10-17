@@ -61,3 +61,21 @@ if podfile.exists():
     print('iOS minimum deployment target set to 14.0 (review plugin release notes).')
 
 print('Only foreground location requested. No external car camera support configured.')
+
+# ROADVISION_KOTLIN_FIX
+for gradle in (
+    Path("android/settings.gradle"),
+    Path("android/settings.gradle.kts"),
+):
+    if gradle.exists():
+        data = gradle.read_text()
+        pattern = r'(id\s*(?:\(\s*)?["\']org\.jetbrains\.kotlin\.android["\'](?:\s*\))?\s+version\s*["\'])[^"\']+'
+        data, count = re.subn(
+            pattern,
+            r'\g<1>2.2.20',
+            data,
+        )
+        if count == 0:
+            raise RuntimeError("Kotlin version not found")
+        gradle.write_text(data)
+        print("Kotlin updated to 2.2.20")
